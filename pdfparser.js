@@ -36,7 +36,7 @@ let PDFParser = (function () {
 
 	let _onPDFJSParserDataError = function(data) {
 		this.data = null;
-		this.emit("pdfParser_dataError", {"parserError": data});
+		this.emit("pdfParser_dataError", {"parserError": data, message: data});
 	};
 
 	let _startParsingPDF = function(buffer) {
@@ -44,6 +44,8 @@ let PDFParser = (function () {
 
 		this.PDFJS.on("pdfjs_parseDataReady", _onPDFJSParseDataReady.bind(this));
 		this.PDFJS.on("pdfjs_parseDataError", _onPDFJSParserDataError.bind(this));
+
+		nodeUtil.emitter.on('error', _onPDFJSParserDataError.bind(this))
 
 		this.PDFJS.parsePDFData(buffer || _binBuffer[this.pdfFilePath + this.pdfFileMTime], _password);
 	};
@@ -90,7 +92,7 @@ let PDFParser = (function () {
     function PdfParser(context, needRawText) {
 		//call constructor for super class
 	    stream.Transform.call(this, {objectMode: true, bufferSize: 64 * 1024});
-	
+
         // private
         let _id = _nextId++;
 
